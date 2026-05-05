@@ -97,14 +97,16 @@ function renderProducts() {
 }
 
 // Filter Products
-function filterProducts(category) {
+function filterProducts(category, event) {
   currentFilter = category;
 
-  // Update active button
   document.querySelectorAll('.filter-btn').forEach((btn) => {
     btn.classList.remove('active');
   });
-  event.target.classList.add('active');
+
+  if (event && event.target) {
+    event.target.classList.add('active');
+  }
 
   renderProducts();
 }
@@ -189,7 +191,7 @@ function updateCart() {
 // Calculate Totals
 function calculateTotals() {
   const subtotal = cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
-  const shipping = subtotal > 50000 ? 0 : 2000; // Free shipping over ₦50,000
+  const shipping = subtotal > 50000 ? 0 : 2000;
   const total = subtotal + shipping;
 
   document.getElementById('subtotal').innerText = subtotal.toLocaleString();
@@ -206,18 +208,14 @@ function removeFromCart(id) {
 
 // Open/Close Cart
 function openCart() {
-  const cartModal = document.getElementById('cart');
-  const overlay = document.getElementById('cartOverlay');
-  cartModal.classList.add('open');
-  overlay.style.display = 'block';
+  document.getElementById('cart').classList.add('open');
+  document.getElementById('cartOverlay').style.display = 'block';
   document.body.style.overflow = 'hidden';
 }
 
 function closeCart() {
-  const cartModal = document.getElementById('cart');
-  const overlay = document.getElementById('cartOverlay');
-  cartModal.classList.remove('open');
-  overlay.style.display = 'none';
+  document.getElementById('cart').classList.remove('open');
+  document.getElementById('cartOverlay').style.display = 'none';
   document.body.style.overflow = 'auto';
 }
 
@@ -227,7 +225,7 @@ function setupFormSubmit() {
   form.addEventListener('submit', handleCheckout);
 }
 
-// Handle Checkout
+// Handle Checkout (FIXED WHATSAPP)
 const WHATSAPP_NUMBER = "2349071809866";
 
 function handleCheckout(e) {
@@ -259,7 +257,7 @@ function handleCheckout(e) {
     .join('\n');
 
   const message = `
-🛒 *NEW ORDER - DLNZ STORE*
+🛒 NEW ORDER - DLNZ STORE
 
 👤 ${name}
 📞 ${phone}
@@ -273,8 +271,13 @@ ${itemsList}
 
   const url = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(message)}`;
 
-  window.open(url, '_blank');
+  // FIXED SAFE OPEN
+  const win = window.open(url, '_blank');
+  if (!win) {
+    window.location.href = url;
+  }
 }
+
 // Validation Functions
 function validateEmail(email) {
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -295,18 +298,7 @@ function resetCheckout() {
   closeCart();
 }
 
-// Show Success Modal
-function showSuccessModal() {
-  const modal = document.getElementById('successModal');
-  modal.classList.add('open');
-}
-
-function closeSuccessModal() {
-  const modal = document.getElementById('successModal');
-  modal.classList.remove('open');
-}
-
-// Notification System
+// Show Notification
 function showNotification(message) {
   const notification = document.createElement('div');
   notification.style.cssText = `
@@ -318,18 +310,16 @@ function showNotification(message) {
     padding: 15px 20px;
     border-radius: 5px;
     z-index: 999;
-    animation: slideIn 0.3s ease;
     font-weight: bold;
   `;
   notification.innerText = message;
+
   document.body.appendChild(notification);
 
-  setTimeout(() => {
-    notification.style.animation = 'slideOut 0.3s ease';
-    setTimeout(() => notification.remove(), 300);
-  }, 3000);
+  setTimeout(() => notification.remove(), 3000);
 }
 
+// Show Error
 function showError(message) {
   const notification = document.createElement('div');
   notification.style.cssText = `
@@ -341,19 +331,16 @@ function showError(message) {
     padding: 15px 20px;
     border-radius: 5px;
     z-index: 999;
-    animation: slideIn 0.3s ease;
     font-weight: bold;
   `;
   notification.innerText = message;
+
   document.body.appendChild(notification);
 
-  setTimeout(() => {
-    notification.style.animation = 'slideOut 0.3s ease';
-    setTimeout(() => notification.remove(), 300);
-  }, 3000);
+  setTimeout(() => notification.remove(), 3000);
 }
 
-// Local Storage Functions
+// Local Storage
 function saveCartToStorage() {
   localStorage.setItem('dlnzCart', JSON.stringify(cart));
 }

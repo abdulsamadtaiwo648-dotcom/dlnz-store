@@ -228,10 +228,11 @@ function setupFormSubmit() {
 }
 
 // Handle Checkout
+const WHATSAPP_NUMBER = "2349071809866";
+
 function handleCheckout(e) {
   e.preventDefault();
 
-  // Validate form
   const name = document.getElementById('name').value.trim();
   const email = document.getElementById('email').value.trim();
   const phone = document.getElementById('phone').value.trim();
@@ -242,41 +243,38 @@ function handleCheckout(e) {
     return;
   }
 
-  if (!validateEmail(email)) {
-    showError('Please enter a valid email address');
-    return;
-  }
-
-  if (!validatePhone(phone)) {
-    showError('Please enter a valid phone number');
-    return;
-  }
-
   if (cart.length === 0) {
     showError('Your cart is empty');
     return;
   }
 
-  // Process Order
-  const total = document.getElementById('total').innerText;
-  const orderMessage = `
-Order Summary:
-Customer: ${name}
-Email: ${email}
-Phone: ${phone}
-Delivery Address: ${address}
-Total Amount: ₦${total}
+  const subtotal = cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
+  const shipping = subtotal > 50000 ? 0 : 2000;
+  const total = subtotal + shipping;
 
-Your order has been confirmed! We'll contact you soon with delivery details.
+  const itemsList = cart
+    .map(item =>
+      `• ${item.name} x${item.quantity} - ₦${(item.price * item.quantity).toLocaleString()}`
+    )
+    .join('\n');
+
+  const message = `
+🛒 *NEW ORDER - DLNZ STORE*
+
+👤 ${name}
+📞 ${phone}
+📍 ${address}
+
+📦 Items:
+${itemsList}
+
+💰 Total: ₦${total.toLocaleString()}
   `.trim();
 
-  document.getElementById('orderMessage').innerText = orderMessage;
-  showSuccessModal();
+  const url = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(message)}`;
 
-  // Reset form and cart
-  resetCheckout();
+  window.open(url, '_blank');
 }
-
 // Validation Functions
 function validateEmail(email) {
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;

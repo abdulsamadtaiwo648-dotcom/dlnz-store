@@ -41,6 +41,17 @@
 </script>
 
 <!-- 2. Your logic -->
+<script type="module">
+  // Firebase FIRST
+  import { initializeApp } from "...";
+
+  const app = initializeApp(firebaseConfig);
+  const db = getFirestore(app);
+
+  window.db = db;
+  window.fb = { ... };
+</script>
+
 <script src="script.js"></script>
 
 </body>

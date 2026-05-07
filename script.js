@@ -1,8 +1,32 @@
+const products = [
+{
+    id: 1,
+    name: "shirt",
+    price: 5000,
+    category: "clothing",
+    stock: 10,
+    emoji: "👕",
+    description: "A comfortable cotton shirt."
+}
+];
+
 // Product Data
-let productData =
-  JSON.parse(localStorage.getItem('dlnzProducts')) || [
-    // keep your original products here as fallback
-  ];
+let productData = [];
+
+function loadProducts() {
+  const ref = window.fb.collection(window.db, "products");
+
+  window.fb.onSnapshot(ref, (snapshot) => {
+    productData = snapshot.docs.map(doc => ({
+      id: doc.id,
+      ...doc.data()
+    }));
+
+    console.log("LIVE PRODUCTS:", productData);
+
+    renderProducts();
+  });
+}
 
 let cart = [];
 let currentFilter = 'all';
@@ -437,6 +461,10 @@ style.innerText = `
   }
 `;
 document.head.appendChild(style);
+
+document.addEventListener("DOMContentLoaded", () => {
+  loadProducts();
+});
 
 
 

@@ -1,54 +1,8 @@
 // Product Data
-const productData = [
-  {
-    id: 1,
-    name: 'Classic DLNZ Hoodie',
-    category: 'hoodie',
-    price: 18000,
-    emoji: '🧥',
-    description: 'Premium comfortable hoodie with signature DLNZ branding',
-  },
-  {
-    id: 2,
-    name: 'Street Vibes T-Shirt',
-    category: 'tshirt',
-    price: 9000,
-    emoji: '👕',
-    description: 'High-quality cotton t-shirt perfect for everyday wear',
-  },
-  {
-    id: 3,
-    name: 'Premium DLNZ Jacket',
-    category: 'jacket',
-    price: 27000,
-    emoji: '🧤',
-    description: 'Stylish bomber jacket with premium materials',
-  },
-  {
-    id: 4,
-    name: 'DLNZ Hoodie Pro',
-    category: 'hoodie',
-    price: 22000,
-    emoji: '🧥',
-    description: 'Enhanced version with premium fabric and fit',
-  },
-  {
-    id: 5,
-    name: 'Graphic T-Shirt',
-    category: 'tshirt',
-    price: 12000,
-    emoji: '👕',
-    description: 'Bold graphic design with comfortable fit',
-  },
-  {
-    id: 6,
-    name: 'Winter Jacket Deluxe',
-    category: 'jacket',
-    price: 35000,
-    emoji: '🧤',
-    description: 'Insulated winter jacket with water resistance',
-  },
-];
+let productData =
+  JSON.parse(localStorage.getItem('dlnzProducts')) || [
+    // keep your original products here as fallback
+  ];
 
 let cart = [];
 let currentFilter = 'all';
@@ -95,6 +49,111 @@ function renderProducts() {
     )
     .join('');
 }
+
+// ===============================
+// ADMIN SYSTEM (LOCALSTORAGE DB)
+// ===============================
+
+// Load products from storage OR fallback to your original list
+productData =
+  JSON.parse(localStorage.getItem('dlnzProducts')) || productData;
+
+// SAVE PRODUCTS
+function saveProducts() {
+  localStorage.setItem('dlnzProducts', JSON.stringify(productData));
+}
+
+// ===============================
+// ADD PRODUCT
+// ===============================
+function addProduct() {
+  const name = document.getElementById('name').value;
+  const price = parseInt(document.getElementById('price').value);
+  const category = document.getElementById('category').value;
+  const emoji = document.getElementById('emoji').value || '🛍️';
+  const stock = parseInt(document.getElementById('stock').value) || 0;
+  const desc = document.getElementById('desc').value;
+
+  if (!name || !price || !category) {
+    alert('Fill required fields');
+    return;
+  }
+
+  const newProduct = {
+    id: Date.now(),
+    name,
+    price,
+    category,
+    emoji,
+    stock,
+    description: desc,
+  };
+
+  productData.push(newProduct);
+
+  saveProducts();
+  renderProducts();     // updates store instantly
+  renderAdmin();        // updates admin list
+
+  clearForm();
+}
+
+// ===============================
+// DELETE PRODUCT
+// ===============================
+function deleteProduct(id) {
+  productData = productData.filter(p => p.id !== id);
+
+  saveProducts();
+  renderProducts();
+  renderAdmin();
+}
+
+// ===============================
+// ADMIN LIST UI
+// ===============================
+function renderAdmin() {
+  const container = document.getElementById('adminList');
+  if (!container) return;
+
+  container.innerHTML = productData
+    .map(
+      p => `
+      <div class="admin-card">
+
+        <div>
+          <strong>${p.name}</strong>
+          <p>₦${p.price} | Stock: ${p.stock}</p>
+        </div>
+
+        <button onclick="deleteProduct(${p.id})">
+          Delete
+        </button>
+
+      </div>
+    `
+    )
+    .join('');
+}
+
+// ===============================
+// CLEAR FORM
+// ===============================
+function clearForm() {
+  document.getElementById('name').value = '';
+  document.getElementById('price').value = '';
+  document.getElementById('category').value = '';
+  document.getElementById('emoji').value = '';
+  document.getElementById('stock').value = '';
+  document.getElementById('desc').value = '';
+}
+
+// ===============================
+// INIT ADMIN
+// ===============================
+document.addEventListener('DOMContentLoaded', () => {
+  renderAdmin();
+});
 
 // Filter Products
 function filterProducts(category, event) {
@@ -378,3 +437,6 @@ style.innerText = `
   }
 `;
 document.head.appendChild(style);
+
+
+

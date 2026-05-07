@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>DLNZ Admin Panel</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+  <div class="admin-container">
+
+    <h1>🧑‍💻 DLNZ ADMIN PANEL</h1>
+
+    <!-- ADD PRODUCT FORM -->
+    <div class="admin-form">
+
+      <input id="name" placeholder="Product Name">
+      <input id="price" type="number" placeholder="Price">
+      <input id="category" placeholder="Category">
+      <input id="emoji" placeholder="Emoji (🧥)">
+      <input id="stock" type="number" placeholder="Stock">
+
+      <textarea id="desc" placeholder="Description"></textarea>
+
+      <button onclick="addProduct()">
+        ➕ Add Product
+      </button>
+
+    </div>
+
+    <hr>
+
+    <h2>📦 Product List</h2>
+    <div id="adminList"></div>
+
+  </div>
+
+  <script src="script.js"></script>
+  <script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+  import {
+    getFirestore,
+    collection,
+    getDocs,
+    addDoc,
+    deleteDoc,
+    doc,
+    updateDoc,
+    onSnapshot
+  } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+  // =======================
+  // FIREBASE CONFIG
+  // =======================
+  const firebaseConfig = {
+    apiKey: "YOUR_KEY",
+    authDomain: "YOUR_DOMAIN",
+    projectId: "YOUR_PROJECT_ID",
+    storageBucket: "YOUR_BUCKET",
+    messagingSenderId: "YOUR_ID",
+    appId: "YOUR_APP_ID"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const db = getFirestore(app);
+
+  window.db = db;
+  window.firebaseAPI = {
+    collection,
+    getDocs,
+    addDoc,
+    deleteDoc,
+    doc,
+    updateDoc,
+    onSnapshot
+  };
+</script>
+
+</body>
+</html>
